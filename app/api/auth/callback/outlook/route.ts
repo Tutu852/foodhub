@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get('state')
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '')
-  const clientId = process.env.OUTLOOK_CLIENT_ID
-  const clientSecret = process.env.OUTLOOK_CLIENT_SECRET
-  const tenantId = process.env.OUTLOOK_TENANT_ID || 'common'
+  const clientId = process.env.OUTLOOK_CLIENT_ID?.trim()
+  const clientSecret = process.env.OUTLOOK_CLIENT_SECRET?.trim()
+  const tenantId = (process.env.OUTLOOK_TENANT_ID || 'common').trim()
 
   try {
     if (!code) {
