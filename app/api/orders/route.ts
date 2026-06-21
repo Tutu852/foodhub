@@ -6,6 +6,7 @@ import { User } from '@/lib/models/User'
 import { Food } from '@/lib/models/Food'
 import mongoose from 'mongoose'
 import { z } from 'zod'
+import { isAdmin } from '@/lib/middleware'
 
 const createOrderSchema = z.object({
   items: z.array(
@@ -32,7 +33,8 @@ export async function GET(request: NextRequest) {
     // Ensure database is connected
     await connectToDatabase()
 
-    const orders = await Order.find({ userId: user.userId })
+    const filter = user.accountType === 'Admin' ? {} : { userId: user.userId }
+    const orders = await Order.find(filter)
       .sort({ createdAt: -1 })
 
     return NextResponse.json(orders)
@@ -114,3 +116,52 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export const PATCH = isAdmin(async (request) => {
+  try {
+    const body = await request.json()
+    const { orderId, status } = body
+
+    if (!orderId || !status) {
+      return NextResponse.json(
+        { error: 'Order ID and status are required' },
+        { status: 400 }
+      )
+    }
+
+    const validStatuses = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled']
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        { error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` },
+        { status: 400 }
+      )
+    }
+
+    await connectToDatabase()
+
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    )
+
+    if (!order) {
+      return NextResponse.json(
+        { error: 'Order not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Order status updated successfully',
+      order,
+    })
+  } catch (error: any) {
+    console.error('[v0] Update order status error:', error)
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    )
+  }
+})

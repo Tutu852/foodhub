@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import connectToDatabase from '@/lib/db'
 import { Food } from '@/lib/models/Food'
-import { auth } from '@/lib/middleware'
+import { isAdmin } from '@/lib/middleware'
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export const POST = auth(async (request) => {
+export const POST = isAdmin(async (request) => {
   try {
     const { name, description, price, category, image, preparationTime } = await request.json()
 

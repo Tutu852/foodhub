@@ -63,6 +63,11 @@ export default function AddItemPage() {
           router.push('/login')
           return
         }
+        const data = await res.json()
+        if (data.accountType !== 'Admin') {
+          router.push('/')
+          return
+        }
         setLoading(false)
       } catch (error) {
         console.error('[v0] Auth verification error:', error)

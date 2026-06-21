@@ -15,6 +15,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
   const [mounted, setMounted] = useState(false)
   const [isAuth, setIsAuth] = useState(isAuthenticated)
   const [cartCount, setCartCount] = useState(0)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -46,23 +47,23 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
   }, [])
 
   useEffect(() => {
-    setIsAuth(isAuthenticated)
-
-    if (!isAuthenticated) {
-      const checkAuth = async () => {
-        try {
-          const res = await fetch('/api/auth/profile')
-          if (res.ok) {
-            setIsAuth(true)
-          } else {
-            setIsAuth(false)
-          }
-        } catch {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/profile')
+        if (res.ok) {
+          const data = await res.json()
+          setIsAuth(true)
+          setUserRole(data.accountType || 'Customer')
+        } else {
           setIsAuth(false)
+          setUserRole(null)
         }
+      } catch {
+        setIsAuth(false)
+        setUserRole(null)
       }
-      checkAuth()
     }
+    checkAuth()
   }, [isAuthenticated])
 
   const handleLogout = async () => {
@@ -113,13 +114,21 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             >
               FAQ
             </Link>
-            {isAuth && (
-              <Link
-                href="/add-item"
-                className="text-foreground hover:text-primary transition-colors font-semibold"
-              >
-                Add Food
-              </Link>
+            {isAuth && userRole === 'Admin' && (
+              <>
+                <Link
+                  href="/admin"
+                  className="text-foreground hover:text-primary transition-colors font-semibold"
+                >
+                  Admin Panel
+                </Link>
+                <Link
+                  href="/add-item"
+                  className="text-foreground hover:text-primary transition-colors font-semibold"
+                >
+                  Add Food
+                </Link>
+              </>
             )}
           </div>
 
@@ -240,12 +249,22 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
           </Link>
           {isAuth ? (
             <>
-              <Link
-                href="/add-item"
-                className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors font-semibold text-primary"
-              >
-                Add Food
-              </Link>
+              {userRole === 'Admin' && (
+                <>
+                  <Link
+                    href="/admin"
+                    className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors font-semibold text-primary"
+                  >
+                    Admin Panel
+                  </Link>
+                  <Link
+                    href="/add-item"
+                    className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors font-semibold text-primary"
+                  >
+                    Add Food
+                  </Link>
+                </>
+              )}
               <Link
                 href="/favorites"
                 className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
