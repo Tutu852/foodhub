@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const clientId = process.env.OUTLOOK_CLIENT_ID
     const tenantId = process.env.OUTLOOK_TENANT_ID || 'common'
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '')
 
     if (!clientId) {
       console.error('OUTLOOK_CLIENT_ID is not configured in .env.local')
