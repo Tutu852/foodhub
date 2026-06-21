@@ -28,6 +28,11 @@ export default function CartPage() {
         const res = await fetch('/api/auth/profile')
         if (res.ok) {
           setIsAuth(true)
+          const profileData = await res.json()
+          if (profileData.accountType === 'Admin') {
+            router.push('/admin')
+            return
+          }
         }
       } catch (error) {
         console.error('Error checking auth:', error)

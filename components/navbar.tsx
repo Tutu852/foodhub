@@ -90,31 +90,34 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              href="/#about"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="/#contact"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Contact
-            </Link>
-            <Link
-              href="/#faq"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              FAQ
-            </Link>
-            {isAuth && userRole === 'Admin' && (
+            {userRole !== 'Admin' ? (
+              <>
+                <Link
+                  href="/"
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/#about"
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  About
+                </Link>
+                <Link
+                  href="/#contact"
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Contact
+                </Link>
+                <Link
+                  href="/#faq"
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  FAQ
+                </Link>
+              </>
+            ) : (
               <>
                 <Link
                   href="/admin"
@@ -134,34 +137,40 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
 
           {/* Right Side Icons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link
-              href="/cart"
-              className="p-2 hover:bg-secondary rounded-full transition-colors relative"
-              title="Cart"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold font-sans">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
+            {userRole !== 'Admin' && (
+              <Link
+                href="/cart"
+                className="p-2 hover:bg-secondary rounded-full transition-colors relative"
+                title="Cart"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold font-sans">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
             {isAuth ? (
               <>
-                <Link
-                  href="/favorites"
-                  className="p-2 hover:bg-secondary rounded-full transition-colors"
-                  title="Favorites"
-                >
-                  <Heart className="w-5 h-5" />
-                </Link>
-                <Link
-                  href="/orders"
-                  className="p-2 hover:bg-secondary rounded-full transition-colors"
-                  title="Orders"
-                >
-                  <span className="text-sm font-semibold">Orders</span>
-                </Link>
+                {userRole !== 'Admin' && (
+                  <>
+                    <Link
+                      href="/favorites"
+                      className="p-2 hover:bg-secondary rounded-full transition-colors"
+                      title="Favorites"
+                    >
+                      <Heart className="w-5 h-5" />
+                    </Link>
+                    <Link
+                      href="/orders"
+                      className="p-2 hover:bg-secondary rounded-full transition-colors"
+                      title="Orders"
+                    >
+                      <span className="text-sm font-semibold">Orders</span>
+                    </Link>
+                  </>
+                )}
                 <Link
                   href="/profile"
                   className="p-2 hover:bg-secondary rounded-full transition-colors"
@@ -212,41 +221,47 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden pb-4 space-y-2 px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/home"
-            className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
-          >
-            Home
-          </Link>
-          <Link
-            href="/#about"
-            className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
-          >
-            About
-          </Link>
-          <Link
-            href="/#contact"
-            className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
-          >
-            Contact
-          </Link>
-          <Link
-            href="/#faq"
-            className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
-          >
-            FAQ
-          </Link>
-          <Link
-            href="/cart"
-            className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors font-medium flex items-center justify-between"
-          >
-            <span>Cart</span>
-            {cartCount > 0 && (
-              <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-bold">
-                {cartCount}
-              </span>
-            )}
-          </Link>
+          {userRole !== 'Admin' && (
+            <Link
+              href="/home"
+              className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+            >
+              Home
+            </Link>
+          )}
+          {userRole !== 'Admin' && (
+            <>
+              <Link
+                href="/#about"
+                className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+              >
+                About
+              </Link>
+              <Link
+                href="/#contact"
+                className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+              >
+                Contact
+              </Link>
+              <Link
+                href="/#faq"
+                className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+              >
+                FAQ
+              </Link>
+              <Link
+                href="/cart"
+                className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors font-medium flex items-center justify-between"
+              >
+                <span>Cart</span>
+                {cartCount > 0 && (
+                  <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-bold">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            </>
+          )}
           {isAuth ? (
             <>
               {userRole === 'Admin' && (
@@ -265,18 +280,22 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                   </Link>
                 </>
               )}
-              <Link
-                href="/favorites"
-                className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
-              >
-                Favorites
-              </Link>
-              <Link
-                href="/orders"
-                className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
-              >
-                Orders
-              </Link>
+              {userRole !== 'Admin' && (
+                <>
+                  <Link
+                    href="/favorites"
+                    className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+                  >
+                    Favorites
+                  </Link>
+                  <Link
+                    href="/orders"
+                    className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+                  >
+                    Orders
+                  </Link>
+                </>
+              )}
               <Link
                 href="/profile"
                 className="block px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"

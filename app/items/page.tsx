@@ -24,6 +24,7 @@ export default function ItemsPage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   const categories = ['all', 'Pizza', 'Burgers', 'Salads', 'Desserts']
 
@@ -48,6 +49,17 @@ export default function ItemsPage() {
           }
         } catch {
           // Not authenticated
+        }
+
+        // Fetch user role
+        try {
+          const profileRes = await fetch('/api/auth/profile')
+          if (profileRes.ok) {
+            const profileData = await profileRes.json()
+            setUserRole(profileData.accountType || 'Customer')
+          }
+        } catch {
+          // Ignore
         }
       } catch (error) {
         console.error('[v0] Error loading data:', error)
@@ -177,6 +189,7 @@ export default function ItemsPage() {
                       prepTime={food.prepTime}
                       isFavorite={favorites.includes(food._id)}
                       onToggleFavorite={handleToggleFavorite}
+                      isAdmin={userRole === 'Admin'}
                     />
                   </motion.div>
                 ))}

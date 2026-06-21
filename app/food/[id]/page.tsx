@@ -28,6 +28,7 @@ export default function FoodDetailsPage() {
   const [quantity, setQuantity] = useState(1)
   const [addingToCart, setAddingToCart] = useState(false)
   const [addedSuccess, setAddedSuccess] = useState(false)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   const handleAddToCart = () => {
     if (!food) return
@@ -84,7 +85,20 @@ export default function FoodDetailsPage() {
       }
     }
 
+    const checkRole = async () => {
+      try {
+        const res = await fetch('/api/auth/profile')
+        if (res.ok) {
+          const data = await res.json()
+          setUserRole(data.accountType || 'Customer')
+        }
+      } catch {
+        // Ignore
+      }
+    }
+
     loadFood()
+    checkRole()
   }, [id])
 
   const handleToggleFavorite = async () => {
@@ -141,16 +155,18 @@ export default function FoodDetailsPage() {
                 fill
                 className="object-cover"
               />
-              <button
-                onClick={handleToggleFavorite}
-                className="absolute top-4 right-4 p-3 bg-card hover:bg-primary rounded-full shadow-lg transition-all"
-              >
-                <Heart
-                  className={`w-6 h-6 transition-colors ${
-                    isFavorite ? 'fill-destructive text-destructive' : 'text-muted-foreground'
-                  }`}
-                />
-              </button>
+              {userRole !== 'Admin' && (
+                <button
+                  onClick={handleToggleFavorite}
+                  className="absolute top-4 right-4 p-3 bg-card hover:bg-primary rounded-full shadow-lg transition-all"
+                >
+                  <Heart
+                    className={`w-6 h-6 transition-colors ${
+                      isFavorite ? 'fill-destructive text-destructive' : 'text-muted-foreground'
+                    }`}
+                  />
+                </button>
+              )}
             </div>
 
             {/* Details */}
@@ -197,45 +213,47 @@ export default function FoodDetailsPage() {
               </div>
 
               {/* Add to Cart */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 bg-secondary p-3 rounded-lg">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-4 py-2 bg-background hover:bg-muted rounded-lg transition-colors"
+              {userRole !== 'Admin' && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 bg-secondary p-3 rounded-lg">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-4 py-2 bg-background hover:bg-muted rounded-lg transition-colors"
+                    >
+                      −
+                    </button>
+                    <span className="text-xl font-semibold flex-1 text-center">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-4 py-2 bg-background hover:bg-muted rounded-lg transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button 
+                    onClick={handleAddToCart}
+                    disabled={addingToCart || addedSuccess}
+                    className={`w-full font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 text-lg disabled:opacity-75 disabled:pointer-events-none cursor-pointer ${
+                      addedSuccess 
+                        ? 'bg-green-600 hover:bg-green-600 text-white' 
+                        : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                    }`}
                   >
-                    −
-                  </button>
-                  <span className="text-xl font-semibold flex-1 text-center">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="px-4 py-2 bg-background hover:bg-muted rounded-lg transition-colors"
-                  >
-                    +
+                    {addedSuccess ? (
+                      <>
+                        <span>✓ Added to Cart!</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-6 h-6" />
+                        <span>{addingToCart ? 'Adding...' : 'Add to Cart'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
-                <button 
-                  onClick={handleAddToCart}
-                  disabled={addingToCart || addedSuccess}
-                  className={`w-full font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 text-lg disabled:opacity-75 disabled:pointer-events-none cursor-pointer ${
-                    addedSuccess 
-                      ? 'bg-green-600 hover:bg-green-600 text-white' 
-                      : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                  }`}
-                >
-                  {addedSuccess ? (
-                    <>
-                      <span>✓ Added to Cart!</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="w-6 h-6" />
-                      <span>{addingToCart ? 'Adding...' : 'Add to Cart'}</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              )}
             </motion.div>
           </motion.div>
         </div>

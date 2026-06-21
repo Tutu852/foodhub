@@ -40,6 +40,20 @@ export default function OrdersPage() {
           return
         }
 
+        // Redirect admins away from customer orders page
+        try {
+          const profileRes = await fetch('/api/auth/profile')
+          if (profileRes.ok) {
+            const profileData = await profileRes.json()
+            if (profileData.accountType === 'Admin') {
+              router.push('/admin')
+              return
+            }
+          }
+        } catch {
+          // Ignore
+        }
+
         const data = await res.json()
         setOrders(data)
       } catch (error) {

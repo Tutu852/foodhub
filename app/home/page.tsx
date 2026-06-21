@@ -24,6 +24,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   const categories = ['all', 'Pizza', 'Burgers', 'Salads', 'Desserts']
 
@@ -38,6 +39,17 @@ export default function HomePage() {
         const foodRes = await fetch(`/api/foods?${params}`)
         const foodData = await foodRes.json()
         setFoods(foodData)
+
+        // Fetch user role
+        try {
+          const profileRes = await fetch('/api/auth/profile')
+          if (profileRes.ok) {
+            const profileData = await profileRes.json()
+            setUserRole(profileData.accountType || 'Customer')
+          }
+        } catch {
+          // Ignore
+        }
 
         // Fetch favorites
         try {
@@ -177,6 +189,7 @@ export default function HomePage() {
                       prepTime={food.prepTime}
                       isFavorite={favorites.includes(food._id)}
                       onToggleFavorite={handleToggleFavorite}
+                      isAdmin={userRole === 'Admin'}
                     />
                   </motion.div>
                 ))}

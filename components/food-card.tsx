@@ -17,6 +17,7 @@ interface FoodCardProps {
   prepTime: number
   isFavorite?: boolean
   onToggleFavorite?: (foodId: string) => Promise<void>
+  isAdmin?: boolean
 }
 
 export function FoodCard({
@@ -30,6 +31,7 @@ export function FoodCard({
   prepTime,
   isFavorite = false,
   onToggleFavorite,
+  isAdmin = false,
 }: FoodCardProps) {
   const [favorite, setFavorite] = useState(isFavorite)
   const [loading, setLoading] = useState(false)
@@ -65,7 +67,7 @@ export function FoodCard({
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-300"
           />
-          {onToggleFavorite && (
+          {!isAdmin && onToggleFavorite && (
             <button
               onClick={handleToggleFavorite}
               disabled={loading}
@@ -105,9 +107,11 @@ export function FoodCard({
           {/* Price and Button */}
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold text-primary">${price}</span>
-            <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-semibold text-sm">
-              Add
-            </button>
+            {!isAdmin && (
+              <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-semibold text-sm">
+                Add
+              </button>
+            )}
           </div>
         </div>
       </div>
